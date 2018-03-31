@@ -90,7 +90,35 @@ $app -> post('/user', function ($req, $resp) {
 
 
 
-$app -> put('/user/:id', function($req, $resp) {
+$app -> put('/user/:id', function ($req, $resp) {
+
+    $id = $req['params']['id'];
+
+    $name = $req['body']['name'];
+    $pay = $req['body']['pay'];
+    $age = $req['body']['age'];
+
+    $sql = 'UPDATE user SET name = :name, pay = :pay, age = :age WHERE id = :id';
+
+    try {
+
+        global $db;
+
+        $sth = $db->prepare($sql);
+
+        $sth->bindParam(':id', $id);
+
+        $sth->bindParam(':name', $name);
+        $sth->bindParam(':pay', $pay);
+        $sth->bindParam(':age', $age);
+
+        $sth->execute();
+
+        echo '{ "notice" : { "text" : "updated successfully" }';
+
+    } catch(PDOEception $e) {
+        echo '{ "error" : { "text" : ' . $e->getMessage() . ' }';
+    }
 
 });
 
