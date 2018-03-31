@@ -32,8 +32,30 @@ $app -> get('/users', function ($req, $resp) {
 
 
 
-$app -> get('/user/:id', function($req, $resp) {
-    
+$app -> get('/user/:id', function ($req, $resp) {
+
+    $id = $req['params']['id'];
+
+    $sql = 'SELECT * FROM user WHERE id = :id';
+
+    try {
+
+        global $db;
+
+        $sth = $db->prepare($sql);
+
+        $sth->bindParam(':id', $id);
+
+        $sth->execute();
+
+        $user = $sth->fetch(PDO::FETCH_OBJ);
+
+        echo json_encode($user, JSON_UNESCAPED_UNICODE);
+
+    } catch(PDOEception $e) {
+        echo '{ "error" : { "text" : ' . $e->getMessage() . ' }';
+    }
+
 });
 
 
