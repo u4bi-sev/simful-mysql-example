@@ -11,6 +11,23 @@ $db = $db->connect();
 
 $app -> get('/users', function ($req, $resp) {
 
+    $sql = 'SELECT * FROM user';
+
+    try {
+
+        global $db;
+
+        $sth = $db->prepare($sql);
+        $sth->execute();
+
+        $users = $sth->fetchAll(PDO::FETCH_OBJ);
+
+        echo json_encode($users, JSON_UNESCAPED_UNICODE);
+
+    } catch(PDOEception $e) {
+        echo '{ "error" : { "text" : ' . $e->getMessage() . ' }';
+    }
+
 });
 
 
