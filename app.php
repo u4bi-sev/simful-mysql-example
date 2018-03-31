@@ -102,7 +102,27 @@ $app -> patch('/user/:id', function($req, $resp) {
 
 
 
-$app -> delete('/user/:id', function($req, $resp) {
+$app -> delete('/user/:id', function ($req, $resp) {
+
+    $id = $req['params']['id'];
+
+    $sql = 'DELETE FROM user WHERE id = :id';
+
+    try {
+
+        global $db;
+
+        $sth = $db->prepare($sql);
+
+        $sth->bindParam(':id', $id);
+
+        $sth->execute();
+
+        echo '{ "notice" : { "text" : "deleted successfully" }';
+
+    } catch(PDOEception $e) {
+        echo '{ "error" : { "text" : ' . $e->getMessage() . ' }';
+    }
 
 });
 
