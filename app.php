@@ -124,7 +124,49 @@ $app -> put('/user/:id', function ($req, $resp) {
 
 
 
-$app -> patch('/user/:id', function($req, $resp) {
+$app -> patch('/user/:id', function ($req, $resp) {
+
+    $id = $req['params']['id'];
+
+    $sql = 'UPDATE user SET ';
+
+    $sql .= substr(
+        array_reduce(
+            $bodies = array_map(function($key, $val) { 
+                return array('key' => $key, 'val' => $val); 
+            }, 
+                array_keys($req['body']),
+                array_values($req['body'])
+            ),
+            function($str, $v) {
+                return $str .= $v['key'] . '=:' . $v['key'] . ',';
+            }
+        )
+    , 0, -1);
+
+    $sql .= ' WHERE id = :id';
+
+    try {
+
+        global $db;
+
+        $sth = $db->prepare($sql);
+
+        $sth->bindParam(':id', $id);
+
+        foreach ($bodies as $v) {
+
+            $sth->bindParam(':' . $v['key'], $v['val']);
+
+        }
+
+        $sth->execute();
+
+        echo '{ "notice" : { "text" : "assigned successfully" }';
+
+    } catch(PDOEception $e) {
+        echo '{ "error" : { "text" : ' . $e->getMessage() . ' }';
+    }
 
 });
 
