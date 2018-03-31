@@ -60,7 +60,31 @@ $app -> get('/user/:id', function ($req, $resp) {
 
 
 
-$app -> post('/user', function($req, $resp) {
+$app -> post('/user', function ($req, $resp) {
+
+    $name = $req['body']['name'];
+    $pay = $req['body']['pay'];
+    $age = $req['body']['age'];
+
+    $sql = 'INSERT INTO user (name, pay, age) VALUES(:name, :pay, :age)';
+
+    try {
+
+        global $db;
+
+        $sth = $db->prepare($sql);
+
+        $sth->bindParam(':name', $name);
+        $sth->bindParam(':pay', $pay);
+        $sth->bindParam(':age', $age);
+
+        $sth->execute();
+
+        echo '{ "notice" : { "text" : "added successfully" }';
+
+    } catch(PDOEception $e) {
+        echo '{ "error" : { "text" : ' . $e->getMessage() . ' }';
+    }
 
 });
 
