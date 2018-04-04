@@ -3,12 +3,13 @@
 class SimFul {
 
     private $_initial = array();
-    private $_data = array( 'GET' => array(), 'POST' => array(), 'PUT' => array(), 'PATCH' => array(), 'DELETE' => array() );
+    private $_endpoints = array( 'GET' => array(), 'POST' => array(), 'PUT' => array(), 'PATCH' => array(), 'DELETE' => array() );
 
     private $_request = array();
     private $_response = array();
 
     public function run() {
+        header('Content-Type: application/json');
 
         parse_str($_SERVER['QUERY_STRING'], $query);
         parse_str(file_get_contents("php://input"), $body);
@@ -20,6 +21,8 @@ class SimFul {
         );
 
         array_map(function($v) {
+
+            $this->_response['header'] = headers_list();
 
             $v($this->_request, $this->_response);
 
@@ -36,7 +39,7 @@ class SimFul {
                 $v['callback']($this->_request, $this->_response);
             }
 
-        }, $this->_data[ $this->_request['method'] ]);
+        }, $this->_endpoints[ $this->_request['method'] ]);
 
         return;
     }
@@ -63,7 +66,7 @@ class SimFul {
 
     private function _push($method, $url, $callback) {
 
-        array_push($this->_data[$method], array('url' => $url, 'callback' => $callback));  
+        array_push($this->_endpoints[$method], array('url' => $url, 'callback' => $callback));  
 
         return;
     }
@@ -106,6 +109,20 @@ class SimFul {
     public function delete($url, $callback) {
 
         $this->_push('DELETE', $url, $callback);
+
+        return;
+    }
+
+    public function header($key, $value) {
+
+        header($key . ': ' . $value);
+
+        return;
+    }
+
+    public function cookie($key, $value) {
+
+        setcookie($key, $value);
 
         return;
     }
