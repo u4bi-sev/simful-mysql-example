@@ -5,6 +5,8 @@ require_once 'config/db.php';
 
 $app = new SimFul();
 
+$app -> header('Access-Control-Allow-Origin', '*');
+
 $db = new db();
 $db = $db->connect();
 
